@@ -1,9 +1,27 @@
 {
-  "version": "1.0.0-*",
+  "name": "Mercurius",
+  "version": "1.0.4-alpha",
+  "description": "Messaging infrastructure for .NET",
+  "copyright": "Richard Beauchamp 2016",
+  "title": "Mercurius",
+  "authors": [ "Richard Beauchamp" ],
+  "language": "en-US",
+  "packOptions": {
+    "summary": "Messaging infrastructure for .NET",
+    "owners": [ "Richard Beauchamp" ],
+    "projectUrl": "https://github.com/rbeauchamp/Mercurius",
+    "licenseUrl": "https://github.com/rbeauchamp/Mercurius/blob/master/LICENSE",
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/rbeauchamp/Mercurius"
+    }
+  },
 
   "dependencies": {
+    "Microsoft.AspNetCore.Mvc.Abstractions": "1.0.0",
     "NETStandard.Library": "1.6.0",
-    "System.ComponentModel.Annotations": "4.1.0"
+    "System.ComponentModel.Annotations": "4.1.0",
+    "System.ComponentModel.TypeConverter": "4.1.0"
   },
 
   "frameworks": {

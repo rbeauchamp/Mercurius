@@ -7,19 +7,15 @@ namespace Mercurius
 {
     public class MessageDispatcher
     {
-        private readonly IServiceProvider _serviceProvider;
-
-        public MessageDispatcher(IServiceProvider serviceProvider)
+        public MessageDispatcher(IServiceProvider serviceProvider, IEnumerable<IMessageHandler> messageHandlers)
         {
-            _serviceProvider = serviceProvider;
+            ServiceProvider = serviceProvider;
+            MessageHandlers = messageHandlers;
         }
 
-        public IEnumerable<IMessageHandler> MessageHandlers { get; set; }
+        public IEnumerable<IMessageHandler> MessageHandlers { get; }
 
-        public IServiceProvider ServiceProvider
-        {
-            get { return _serviceProvider; }
-        }
+        public IServiceProvider ServiceProvider { get; }
 
         public async Task DispatchAsync(Message message)
         {

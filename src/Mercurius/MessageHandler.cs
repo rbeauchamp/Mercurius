@@ -18,6 +18,12 @@ namespace Mercurius
 
         protected abstract Task OnHandleAsync(Message message);
 
+        /// <summary>
+        /// The types of messages handled by this message handler.
+        /// </summary>
+        /// <remarks>
+        /// The types must be a sub-class of <see cref="Message"/>.
+        /// </remarks>
         public abstract IEnumerable<Type> MessageTypes { get; }
     }
 }
