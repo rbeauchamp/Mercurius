@@ -27,4 +27,4 @@ using System.Runtime.InteropServices;
 // MAJOR version when you make incompatible API changes,
 // MINOR version when you add functionality in a backwards-compatible manner, and
 // PATCH version when you make backwards-compatible bug fixes.
-[assembly: AssemblyInformationalVersion("1.0.0")]
+[assembly: AssemblyInformationalVersion("1.0.0-alpha")]
