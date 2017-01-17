@@ -1,6 +1,6 @@
 {
   "name": "Mercurius",
-  "version": "1.0.7-alpha",
+  "version": "1.0.8-alpha",
   "description": "Messaging infrastructure for .NET",
   "copyright": "Richard Beauchamp 2016",
   "title": "Mercurius",
@@ -19,6 +19,7 @@
 
   "dependencies": {
     "Microsoft.AspNetCore.Mvc.Abstractions": "1.1.0",
+    "Microsoft.Extensions.Logging.Abstractions": "1.1.0",
     "NETStandard.Library": "1.6.1",
     "System.ComponentModel.Annotations": "4.3.0",
     "System.ComponentModel.TypeConverter": "4.3.0"

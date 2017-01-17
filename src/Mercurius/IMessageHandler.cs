@@ -10,9 +10,16 @@ namespace Mercurius
     public interface IMessageHandler
     {
         /// <summary>
-        /// Handles the mesage.
+        /// Handle the message.
         /// </summary>
         Task HandleAsync(IMessage message);
+
+        /// <summary>
+        /// Try to handle the message.
+        /// If successfully handled, return true,
+        /// otherwise, false.
+        /// </summary>
+        Task<bool> TryHandleAsync(IMessage message);
 
         /// <summary>
         /// The types of messages handled by this message handler.

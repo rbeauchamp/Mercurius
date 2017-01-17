@@ -6,10 +6,6 @@ namespace Mercurius
 {
     public abstract class MessageHandler : IMessageHandler
     {
-        protected MessageHandler()
-        {
-        }
-
         public async Task HandleAsync(IMessage message)
         {
             // Dispatch message to the subtype
@@ -25,5 +21,10 @@ namespace Mercurius
         /// The types must be a sub-class of <see cref="Message"/>.
         /// </remarks>
         public abstract IEnumerable<Type> MessageTypes { get; }
+
+        public virtual Task<bool> TryHandleAsync(IMessage message)
+        {
+            throw new NotImplementedException($"You must override this method to handle the message type {message.GetType()}");
+        }
     }
 }
