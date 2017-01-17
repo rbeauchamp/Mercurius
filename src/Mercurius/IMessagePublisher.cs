@@ -10,6 +10,6 @@ namespace Mercurius
         /// <summary>
         /// Publishes the given message.
         /// </summary>
-        Task PublishAsync(Message message);
+        Task PublishAsync(IMessage message);
     }
 }

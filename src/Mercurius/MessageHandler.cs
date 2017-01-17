@@ -10,13 +10,13 @@ namespace Mercurius
         {
         }
 
-        public async Task HandleAsync(Message message)
+        public async Task HandleAsync(IMessage message)
         {
             // Dispatch message to the subtype
             await OnHandleAsync(message);
         }
 
-        protected abstract Task OnHandleAsync(Message message);
+        protected abstract Task OnHandleAsync(IMessage message);
 
         /// <summary>
         /// The types of messages handled by this message handler.

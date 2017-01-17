@@ -9,6 +9,6 @@
         /// Dispatches the specified message to message handlers.
         /// </summary>
         /// <param name="message">The message to dispatch.</param>
-        void Dispatch(Message message);
+        void Dispatch(IMessage message);
     }
 }

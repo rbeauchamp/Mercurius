@@ -17,7 +17,7 @@ namespace Mercurius
 
         public IServiceProvider ServiceProvider { get; }
 
-        public async Task DispatchAsync(Message message)
+        public async Task DispatchAsync(IMessage message)
         {
             var tasks = MessageHandlers
                 .Where(handler => handler.MessageTypes.Any(type => type.IsInstanceOfType(message)))
@@ -26,12 +26,12 @@ namespace Mercurius
             await Task.WhenAll(tasks);
         }
 
-        private async Task HandleAsync(Message message, IMessageHandler handler)
+        private async Task HandleAsync(IMessage message, IMessageHandler handler)
         {
             await handler.HandleAsync(message);
         }
 
-        public async Task DispatchAsync(IEnumerable<Message> messages)
+        public async Task DispatchAsync(IEnumerable<IMessage> messages)
         {
             foreach (var message in messages)
             {

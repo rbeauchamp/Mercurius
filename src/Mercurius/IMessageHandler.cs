@@ -12,13 +12,13 @@ namespace Mercurius
         /// <summary>
         /// Handles the mesage.
         /// </summary>
-        Task HandleAsync(Message message);
+        Task HandleAsync(IMessage message);
 
         /// <summary>
         /// The types of messages handled by this message handler.
         /// </summary>
         /// <remarks>
-        /// The types must be a sub-class of <see cref="Message"/>.
+        /// The types must implement <see cref="IMessage"/>.
         /// </remarks>
         IEnumerable<Type> MessageTypes { get; }
     }

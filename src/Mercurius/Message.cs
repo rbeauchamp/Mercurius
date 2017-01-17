@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Mercurius
 {
-    public abstract class Message : IValidatableObject, IAsyncValidatableObject
+    public abstract class Message : IMessage
     {
         /// <summary>
         ///     Determines whether the specified object is valid.
