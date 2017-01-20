@@ -17,35 +17,28 @@ namespace Mercurius
             _logger = logger;
         }
 
-        //public IEnumerable<IMessageHandler> MessageHandlers { get; }
-
-        public async Task DispatchAsync(IMessage message)
+        public async Task DispatchAsync(IMessage message, Principal principal)
         {
             var tasks = _messageHandlers
                 .Where(handler => handler.MessageTypes.Any(type => type.IsInstanceOfType(message)))
-                .Select(handler => HandleAsync(message, handler));
+                .Select(async handler => await handler.HandleAsync(message, principal));
 
             await Task.WhenAll(tasks);
         }
 
-        public async Task<bool> TryDispatchToSingleHandlerAsync(IMessage message)
+        public async Task<bool> TryDispatchToSingleHandlerAsync(IMessage message, Principal principal)
         {
             try
             {
                 return await _messageHandlers
                     .Single(handler => handler.MessageTypes.Any(type => type.IsInstanceOfType(message)))
-                    .TryHandleAsync(message);
+                    .TryHandleAsync(message, principal);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex.ToString());
             }
             return false;
-        }
-
-        private static async Task HandleAsync(IMessage message, IMessageHandler handler)
-        {
-            await handler.HandleAsync(message);
         }
     }
 }

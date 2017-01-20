@@ -12,14 +12,14 @@ namespace Mercurius
         /// <summary>
         /// Handle the message.
         /// </summary>
-        Task HandleAsync(IMessage message);
+        Task HandleAsync(IMessage message, Principal principal);
 
         /// <summary>
         /// Try to handle the message.
         /// If successfully handled, return true,
         /// otherwise, false.
         /// </summary>
-        Task<bool> TryHandleAsync(IMessage message);
+        Task<bool> TryHandleAsync(IMessage message, Principal principal);
 
         /// <summary>
         /// The types of messages handled by this message handler.

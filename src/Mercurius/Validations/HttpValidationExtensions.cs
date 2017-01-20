@@ -12,45 +12,17 @@ namespace Mercurius.Validations
     public static class HttpValidationExtensions
     {
         /// <summary>
-        /// Determines whether this instance is valid, if not, then throws an HttpResponseException
-        /// with the ModelState errors.
+        /// Determines whether this instance is valid.
         /// </summary>
         /// <param name="instance">The instance to validate.</param>
         /// <param name="serviceProvider">The service provider.</param>
         /// <param name="modelState">State of the model.</param>
-        public static ModelStateDictionary IsValidOrThrowException(this IValidatableObject instance, IServiceProvider serviceProvider, ModelStateDictionary modelState)
-        {
-            instance.IsValid(serviceProvider, modelState);
-            
-            return modelState;
-        }
-
-        /// <summary>
-        /// Determines whether this instance is valid, if not, then throws an HttpResponseException
-        /// with the ModelState errors.
-        /// </summary>
-        /// <param name="instance">The instance to validate.</param>
-        /// <param name="serviceProvider">The service provider.</param>
-        /// <param name="modelState">State of the model.</param>
-        public static async Task<ModelStateDictionary> IsValidOrThrowExceptionAsync(this IAsyncValidatableObject instance, IServiceProvider serviceProvider, ModelStateDictionary modelState)
-        {
-            await instance.IsValidAsync(serviceProvider, modelState);
-
-            return modelState;
-        }
-
-        /// <summary>
-        ///     Determines whether this instance is valid.
-        /// </summary>
-        /// <param name="instance">The instance to validate.</param>
-        /// <param name="serviceProvider">The service provider.</param>
-        /// <param name="modelState">State of the model.</param>
-        /// <returns></returns>
-        private static async Task<bool> IsValidAsync(this IAsyncValidatableObject instance, IServiceProvider serviceProvider, ModelStateDictionary modelState)
+        /// <param name="items">The dictionary of key/value pairs to associate with this context.</param>
+        public static async Task<bool> IsValidAsync(this IAsyncValidatableObject instance, IServiceProvider serviceProvider, ModelStateDictionary modelState, IDictionary<object, object> items)
         {
             var validationResults = new List<ValidationResult>();
 
-            var isValid = await AsyncValidator.TryValidateObjectAsync(instance, new ValidationContext(instance, serviceProvider, null), validationResults, true);
+            var isValid = await AsyncValidator.TryValidateObjectAsync(instance, new ValidationContext(instance, serviceProvider, items), validationResults, true);
 
             var flattenedValidationResults = Flatten(validationResults);
 
