@@ -28,17 +28,9 @@ namespace Mercurius
 
         public async Task<bool> TryDispatchToSingleHandlerAsync(IMessage message, Principal principal)
         {
-            try
-            {
-                return await _messageHandlers
-                    .Single(handler => handler.MessageTypes.Any(type => type.IsInstanceOfType(message)))
-                    .TryHandleAsync(message, principal);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.ToString());
-            }
-            return false;
+            return await _messageHandlers
+                .Single(handler => handler.MessageTypes.Any(type => type.IsInstanceOfType(message)))
+                .TryHandleAsync(message, principal);
         }
     }
 }
