@@ -1,23 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 
 namespace Mercurius
 {
     public class MessageDispatcher
     {
         private readonly IEnumerable<IMessageHandler> _messageHandlers;
-        private readonly ILogger<MessageDispatcher> _logger;
 
-        public MessageDispatcher(IEnumerable<IMessageHandler> messageHandlers, ILogger<MessageDispatcher> logger)
+        public MessageDispatcher(IEnumerable<IMessageHandler> messageHandlers)
         {
             _messageHandlers = messageHandlers;
-            _logger = logger;
         }
 
-        public async Task DispatchAsync(IMessage message, Principal principal)
+        public async Task DispatchToAllAsync(IMessage message, Principal principal)
         {
             var tasks = _messageHandlers
                 .Where(handler => handler.MessageTypes.Any(type => type.IsInstanceOfType(message)))
@@ -26,11 +22,18 @@ namespace Mercurius
             await Task.WhenAll(tasks).ConfigureAwait(false);
         }
 
-        public async Task<bool> TryDispatchToSingleHandlerAsync(IMessage message, Principal principal)
+        public async Task<bool> TryDispatchToSingleAsync(IMessage message, Principal principal)
         {
             return await _messageHandlers
                 .Single(handler => handler.MessageTypes.Any(type => type.IsInstanceOfType(message)))
                 .TryHandleAsync(message, principal).ConfigureAwait(false);
+        }
+
+        public async Task<IQueryable<T>> DispatchToSingleAsync<T>(IQuery<T> query, Principal principal)
+        {
+            return await _messageHandlers
+                .Single(handler => handler.MessageTypes.Any(type => type.IsInstanceOfType(query)))
+                .HandleAsync(query, principal).ConfigureAwait(false);
         }
     }
 }

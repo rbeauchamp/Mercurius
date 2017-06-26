@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Mercurius
@@ -13,6 +14,11 @@ namespace Mercurius
         /// Handle the message.
         /// </summary>
         Task HandleAsync(IMessage message, Principal principal);
+
+        /// <summary>
+        /// Handle the query.
+        /// </summary>
+        Task<IQueryable<T>> HandleAsync<T>(IQuery<T> query, Principal principal);
 
         /// <summary>
         /// Try to handle the message.
