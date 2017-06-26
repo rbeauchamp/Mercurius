@@ -30,7 +30,7 @@ namespace Mercurius.Validations
 
         public static async Task<bool> TryValidateObjectAsync(object instance, ValidationContext validationContext, ICollection<ValidationResult> validationResults)
         {
-            return await TryValidateObjectAsync(instance, validationContext, validationResults, false);
+            return await TryValidateObjectAsync(instance, validationContext, validationResults, false).ConfigureAwait(false);
         }
 
         public static async Task<bool> TryValidateObjectAsync(object instance, ValidationContext validationContext, ICollection<ValidationResult> validationResults, bool validateAllProperties)
@@ -45,7 +45,7 @@ namespace Mercurius.Validations
             }
             var flag = true;
             var breakOnFirstError = validationResults == null;
-            foreach (var validationError in await GetObjectValidationErrorsAsync(instance, validationContext, validateAllProperties, breakOnFirstError))
+            foreach (var validationError in await GetObjectValidationErrorsAsync(instance, validationContext, validateAllProperties, breakOnFirstError).ConfigureAwait(false))
             {
                 flag = false;
                 validationResults?.Add(validationError.ValidationResult);
@@ -76,7 +76,7 @@ namespace Mercurius.Validations
 
         public static async Task ValidateObjectAsync(object instance, ValidationContext validationContext)
         {
-            await ValidateObjectAsync(instance, validationContext, false);
+            await ValidateObjectAsync(instance, validationContext, false).ConfigureAwait(false);
         }
 
         public static async Task ValidateObjectAsync(object instance, ValidationContext validationContext, bool validateAllProperties)
@@ -93,7 +93,7 @@ namespace Mercurius.Validations
             {
                 throw new ArgumentException("InstanceMustMatchValidationContextInstance", nameof(instance));
             }
-            var validationError = (await GetObjectValidationErrorsAsync(instance, validationContext, validateAllProperties, false)).FirstOrDefault();
+            var validationError = (await GetObjectValidationErrorsAsync(instance, validationContext, validateAllProperties, false).ConfigureAwait(false)).FirstOrDefault();
             validationError?.ThrowValidationException();
         }
 
@@ -170,7 +170,7 @@ namespace Mercurius.Validations
             var validatableObject = instance as IAsyncValidatableObject;
             if (validatableObject != null)
             {
-                list.AddRange((await validatableObject.ValidateAsync(validationContext)).Where(r => r != ValidationResult.Success).Select(validationResult => new ValidationError(null, instance, validationResult)));
+                list.AddRange((await validatableObject.ValidateAsync(validationContext).ConfigureAwait(false)).Where(r => r != ValidationResult.Success).Select(validationResult => new ValidationError(null, instance, validationResult)));
             }
             return list;
         }

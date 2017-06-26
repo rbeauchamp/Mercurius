@@ -11,7 +11,7 @@ namespace Mercurius
         public async Task HandleAsync(IMessage message, Principal principal)
         {
             // Dispatch message to the subtype
-            await OnHandleAsync(message, principal);
+            await OnHandleAsync(message, principal).ConfigureAwait(false);
         }
         protected abstract Task OnHandleAsync(IMessage message, Principal principal);
 

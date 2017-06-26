@@ -22,7 +22,7 @@ namespace Mercurius.Validations
         {
             var validationResults = new List<ValidationResult>();
 
-            var isValid = await AsyncValidator.TryValidateObjectAsync(instance, new ValidationContext(instance, serviceProvider, items), validationResults, true);
+            var isValid = await AsyncValidator.TryValidateObjectAsync(instance, new ValidationContext(instance, serviceProvider, items), validationResults, true).ConfigureAwait(false);
 
             var flattenedValidationResults = Flatten(validationResults);
 

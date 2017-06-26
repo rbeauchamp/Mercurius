@@ -21,16 +21,16 @@ namespace Mercurius
         {
             var tasks = _messageHandlers
                 .Where(handler => handler.MessageTypes.Any(type => type.IsInstanceOfType(message)))
-                .Select(async handler => await handler.HandleAsync(message, principal));
+                .Select(async handler => await handler.HandleAsync(message, principal).ConfigureAwait(false));
 
-            await Task.WhenAll(tasks);
+            await Task.WhenAll(tasks).ConfigureAwait(false);
         }
 
         public async Task<bool> TryDispatchToSingleHandlerAsync(IMessage message, Principal principal)
         {
             return await _messageHandlers
                 .Single(handler => handler.MessageTypes.Any(type => type.IsInstanceOfType(message)))
-                .TryHandleAsync(message, principal);
+                .TryHandleAsync(message, principal).ConfigureAwait(false);
         }
     }
 }
