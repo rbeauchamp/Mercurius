@@ -11,21 +11,22 @@ namespace Mercurius
     public interface IMessageHandler
     {
         /// <summary>
-        /// Handle the message.
+        /// Handle the event.
         /// </summary>
-        Task HandleAsync(IMessage message, Principal principal);
+        Task HandleAsync(Event @event, Principal principal);
 
         /// <summary>
         /// Handle the query.
         /// </summary>
-        Task<IQueryable<T>> HandleAsync<T>(IQuery<T> query, Principal principal);
+        Task<IQueryable<T>> HandleAsync<T>(IQuery<T> query, Principal principal)
+            where T : class;
 
         /// <summary>
-        /// Try to handle the message.
+        /// Try to handle the command.
         /// If successfully handled, return true,
         /// otherwise, false.
         /// </summary>
-        Task<bool> TryHandleAsync(IMessage message, Principal principal);
+        Task<bool> TryHandleAsync(Command command, Principal principal);
 
         /// <summary>
         /// The types of messages handled by this message handler.

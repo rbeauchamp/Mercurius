@@ -4,13 +4,14 @@ using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.Contracts;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace Mercurius.Validations
 {
     public static class ValidationExtensions
     {
         /// <summary>
-        ///     Determines whether this instance is valid.
+        /// Determines whether this instance is valid.
         /// </summary>
         /// <param name="instance">The instance to validate.</param>
         /// <param name="serviceProvider">The service provider.</param>
@@ -18,6 +19,17 @@ namespace Mercurius.Validations
         public static bool IsValid(this object instance, IServiceProvider serviceProvider)
         {
             return Validator.TryValidateObject(instance, new ValidationContext(instance, serviceProvider, null), null, true);
+        }
+
+        /// <summary>
+        /// Determines whether this instance is valid.
+        /// </summary>
+        /// <param name="instance">The instance to validate.</param>
+        /// <param name="serviceProvider">The service provider.</param>
+        [Pure]
+        public static async Task<bool> IsValidAsync(this object instance, IServiceProvider serviceProvider)
+        {
+            return await AsyncValidator.TryValidateObjectAsync(instance, new ValidationContext(instance, serviceProvider, null), null, true).ConfigureAwait(false);
         }
 
         public static ValidationResult CreateValidationError<TSource, TProperty>(this TSource source, Expression<Func<TSource, TProperty>> propertyLambda, string errorMessageFormat)

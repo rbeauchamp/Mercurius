@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Mercurius
 {
-    public class MessageDispatcher
+    public sealed class MessageDispatcher
     {
         private readonly IEnumerable<IMessageHandler> _messageHandlers;
 
@@ -13,23 +13,24 @@ namespace Mercurius
             _messageHandlers = messageHandlers;
         }
 
-        public async Task DispatchToAllAsync(IMessage message, Principal principal)
+        public async Task DispatchToAllAsync(Event @event, Principal principal)
         {
             var tasks = _messageHandlers
-                .Where(handler => handler.MessageTypes.Any(type => type.IsInstanceOfType(message)))
-                .Select(async handler => await handler.HandleAsync(message, principal).ConfigureAwait(false));
+                .Where(handler => handler.MessageTypes.Any(type => type.IsInstanceOfType(@event)))
+                .Select(async handler => await handler.HandleAsync(@event, principal).ConfigureAwait(false));
 
             await Task.WhenAll(tasks).ConfigureAwait(false);
         }
 
-        public async Task<bool> TryDispatchToSingleAsync(IMessage message, Principal principal)
+        public async Task<bool> TryDispatchToSingleAsync(Command command, Principal principal)
         {
             return await _messageHandlers
-                .Single(handler => handler.MessageTypes.Any(type => type.IsInstanceOfType(message)))
-                .TryHandleAsync(message, principal).ConfigureAwait(false);
+                .Single(handler => handler.MessageTypes.Any(type => type.IsInstanceOfType(command)))
+                .TryHandleAsync(command, principal).ConfigureAwait(false);
         }
 
         public async Task<IQueryable<T>> DispatchToSingleAsync<T>(IQuery<T> query, Principal principal)
+            where T : class
         {
             return await _messageHandlers
                 .Single(handler => handler.MessageTypes.Any(type => type.IsInstanceOfType(query)))

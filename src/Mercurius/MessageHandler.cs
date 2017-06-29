@@ -9,17 +9,17 @@ namespace Mercurius
     {
         public abstract IEnumerable<Type> MessageTypes { get; }
 
-        public virtual Task HandleAsync(IMessage message, Principal principal)
+        public virtual Task HandleAsync(Event @event, Principal principal)
         {
-            throw new NotImplementedException($"You must override this method to handle the message type {message.GetType()}");
+            throw new NotImplementedException($"You must override this method to handle the message type {@event.GetType()}");
         }
 
-        public virtual Task<bool> TryHandleAsync(IMessage message, Principal principal)
+        public virtual Task<bool> TryHandleAsync(Command command, Principal principal)
         {
-            throw new NotImplementedException($"You must override this method to handle the message type {message.GetType()}");
+            throw new NotImplementedException($"You must override this method to handle the message type {command.GetType()}");
         }
 
-        public virtual Task<IQueryable<T>> HandleAsync<T>(IQuery<T> query, Principal principal)
+        public virtual Task<IQueryable<T>> HandleAsync<T>(IQuery<T> query, Principal principal) where T : class
         {
             throw new NotImplementedException($"You must override this method to handle the query type {query.GetType()}");
         }
