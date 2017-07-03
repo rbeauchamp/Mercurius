@@ -19,7 +19,7 @@ namespace Mercurius
             throw new NotImplementedException($"You must override this method to handle the message type {command.GetType()}");
         }
 
-        public virtual Task<IQueryable<T>> HandleAsync<T>(IQuery<T> query, Principal principal) where T : class
+        public virtual Task<IQueryable<T>> GetAsync<T>(IQuery<T> query, Principal principal)
         {
             throw new NotImplementedException($"You must override this method to handle the query type {query.GetType()}");
         }

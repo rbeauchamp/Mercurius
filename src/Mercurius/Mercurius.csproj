@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Description>Messaging infrastructure for .NET</Description>
+    <Copyright>Richard Beauchamp 2016-2017</Copyright>
+    <AssemblyTitle>Mercurius</AssemblyTitle>
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <Authors>Richard Beauchamp</Authors>
+    <TargetFramework>netcoreapp1.1</TargetFramework>
+    <AssemblyName>Mercurius</AssemblyName>
+    <PackageId>Mercurius</PackageId>
+    <PackageProjectUrl>https://github.com/rbeauchamp/Mercurius</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/rbeauchamp/Mercurius/blob/master/LICENSE</PackageLicenseUrl>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/rbeauchamp/Mercurius</RepositoryUrl>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Version>1.0.17-beta10</Version>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="1.1.2" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="1.1.1" />
+    <PackageReference Include="System.ComponentModel.Annotations" Version="4.3.0" />
+    <PackageReference Include="System.ComponentModel.TypeConverter" Version="4.3.0" />
+  </ItemGroup>
+</Project>

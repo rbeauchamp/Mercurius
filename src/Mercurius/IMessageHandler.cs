@@ -16,10 +16,9 @@ namespace Mercurius
         Task HandleAsync(Event @event, Principal principal);
 
         /// <summary>
-        /// Handle the query.
+        /// Get the results of query.
         /// </summary>
-        Task<IQueryable<T>> HandleAsync<T>(IQuery<T> query, Principal principal)
-            where T : class;
+        Task<IQueryable<T>> GetAsync<T>(IQuery<T> query, Principal principal);
 
         /// <summary>
         /// Try to handle the command.
