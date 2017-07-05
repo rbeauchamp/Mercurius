@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Mercurius.Test.Domain.Customers;
@@ -26,6 +27,25 @@ namespace Mercurius.Test.Tests
             // Assert
             results.Should().NotBeNull();
             results.Should().HaveCount(1);
+        }
+
+        [Fact]
+        public void It_should_throw_an_exception_if_no_handler_found_for_event()
+        {
+            // Arrange
+            var serviceProvider = new ServiceCollection()
+                .AddTransient<IMessageDispatcher, MessageDispatcher>()
+                .AddTransient<IMessageHandler, CustomersDomain>()
+                .BuildServiceProvider();
+
+            var @event = new CustomerCreated();
+            var messageDispatcher = serviceProvider.GetRequiredService<IMessageDispatcher>();
+
+            // Act
+            Func<Task> action = async () => await messageDispatcher.DispatchToAllAsync(@event, new Principal());
+
+            // Assert
+            action.ShouldThrow<Exception>();
         }
     }
 }

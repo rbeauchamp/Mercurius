@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Mercurius
 {
-    public sealed class MessageDispatcher : IMessageDispatcher
+    public class MessageDispatcher : IMessageDispatcher
     {
         private readonly IEnumerable<IMessageHandler> _messageHandlers;
 
