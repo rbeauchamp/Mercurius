@@ -22,7 +22,7 @@ namespace Mercurius.Test.Tests
             var messageDispatcher = serviceProvider.GetRequiredService<IMessageDispatcher>();
 
             // Act
-            var results = await messageDispatcher.DispatchToSingleAsync(query, new Principal());
+            var results = await messageDispatcher.DispatchAsync(query, new Principal());
 
             // Assert
             results.Should().NotBeNull();
@@ -42,7 +42,7 @@ namespace Mercurius.Test.Tests
             var messageDispatcher = serviceProvider.GetRequiredService<IMessageDispatcher>();
 
             // Act
-            Func<Task> action = async () => await messageDispatcher.DispatchToAllAsync(@event, new Principal());
+            Func<Task> action = async () => await messageDispatcher.DispatchAsync(@event, new Principal());
 
             // Assert
             action.ShouldThrow<Exception>();

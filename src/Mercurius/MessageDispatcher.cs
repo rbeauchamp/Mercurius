@@ -14,7 +14,7 @@ namespace Mercurius
             _messageHandlers = messageHandlers;
         }
 
-        public async Task DispatchToAllAsync(Event @event, Principal principal)
+        public async Task DispatchAsync(Event @event, Principal principal)
         {
             var messageHandlers = _messageHandlers
                 .Where(handler => handler.MessageTypes.Any(type => type.IsInstanceOfType(@event)));
@@ -31,7 +31,7 @@ namespace Mercurius
             await Task.WhenAll(tasks).ConfigureAwait(false);
         }
 
-        public async Task<bool> TryDispatchToSingleAsync(Command command, Principal principal)
+        public async Task<bool> TryDispatchAsync(Command command, Principal principal)
         {
             var messageHandler = _messageHandlers
                 .SingleOrDefault(handler => handler.MessageTypes.Any(type => type.IsInstanceOfType(command)));
@@ -44,7 +44,7 @@ namespace Mercurius
             return await messageHandler.TryHandleAsync(command, principal).ConfigureAwait(false);
         }
 
-        public async Task<IQueryable<T>> DispatchToSingleAsync<T>(IQuery<T> query, Principal principal)
+        public async Task<IQueryable<T>> DispatchAsync<T>(IQuery<T> query, Principal principal)
         {
             var messageHandler = _messageHandlers
                 .SingleOrDefault(handler => handler.MessageTypes.Any(type => type.IsInstanceOfType(query)));
