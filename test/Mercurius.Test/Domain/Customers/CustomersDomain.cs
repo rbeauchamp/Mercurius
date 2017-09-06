@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Principal;
 using System.Threading.Tasks;
 using Mercurius.Test.Model;
 
@@ -16,7 +17,7 @@ namespace Mercurius.Test.Domain.Customers
             }
         }
 
-        public override async Task<IQueryable<T>> GetAsync<T>(IQuery<T> query, Principal principal)
+        public override async Task<IQueryable<T>> GetAsync<T>(IQuery<T> query, IPrincipal principal)
         {
             switch (query)
             {
@@ -27,7 +28,7 @@ namespace Mercurius.Test.Domain.Customers
             }
         }
 
-        private static Task<IQueryable<Customer>> GetAsync(GetCustomers getCustomers, Principal principal)
+        private static Task<IQueryable<Customer>> GetAsync(GetCustomers getCustomers, IPrincipal principal)
         {
             return Task.FromResult(new List<Customer>{new Customer()}.AsQueryable());
         }

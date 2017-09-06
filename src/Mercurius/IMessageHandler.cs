@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Principal;
 using System.Threading.Tasks;
 
 namespace Mercurius
@@ -13,19 +14,19 @@ namespace Mercurius
         /// <summary>
         /// Handle the event.
         /// </summary>
-        Task HandleAsync(Event @event, Principal principal);
+        Task HandleAsync(Event @event, IPrincipal principal);
 
         /// <summary>
         /// Get the results of query.
         /// </summary>
-        Task<IQueryable<T>> GetAsync<T>(IQuery<T> query, Principal principal);
+        Task<IQueryable<T>> GetAsync<T>(IQuery<T> query, IPrincipal principal);
 
         /// <summary>
         /// Try to handle the command.
         /// If successfully handled, return true,
         /// otherwise, false.
         /// </summary>
-        Task<bool> TryHandleAsync(Command command, Principal principal);
+        Task<bool> TryHandleAsync(Command command, IPrincipal principal);
 
         /// <summary>
         /// The types of messages handled by this message handler.

@@ -1,4 +1,6 @@
 using System;
+using System.Security.Claims;
+using System.Security.Principal;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Mercurius.Test.Domain.Customers;
@@ -22,7 +24,7 @@ namespace Mercurius.Test.Tests
             var messageDispatcher = serviceProvider.GetRequiredService<IMessageDispatcher>();
 
             // Act
-            var results = await messageDispatcher.DispatchAsync(query, new Principal());
+            var results = await messageDispatcher.DispatchAsync(query, ClaimsPrincipal.Current);
 
             // Assert
             results.Should().NotBeNull();
@@ -42,7 +44,7 @@ namespace Mercurius.Test.Tests
             var messageDispatcher = serviceProvider.GetRequiredService<IMessageDispatcher>();
 
             // Act
-            Func<Task> action = async () => await messageDispatcher.DispatchAsync(@event, new Principal());
+            Func<Task> action = async () => await messageDispatcher.DispatchAsync(@event, ClaimsPrincipal.Current);
 
             // Assert
             action.ShouldThrow<Exception>();

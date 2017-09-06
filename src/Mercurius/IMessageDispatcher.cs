@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Security.Principal;
 using System.Threading.Tasks;
 
 namespace Mercurius
@@ -10,7 +11,7 @@ namespace Mercurius
         /// </summary>
         /// <param name="event">The event.</param>
         /// <param name="principal">The principal dispatching the event.</param>
-        Task DispatchAsync(Event @event, Principal principal);
+        Task DispatchAsync(Event @event, IPrincipal principal);
 
         /// <summary>
         /// Dispatch the query to the <see cref="MessageHandler" /> configured to handle it.
@@ -19,13 +20,13 @@ namespace Mercurius
         /// <param name="query">The query.</param>
         /// <param name="principal">The principal dispatching the query.</param>
         /// <returns>A non-null queryable of the given <typeparamref name="T"/></returns>
-        Task<IQueryable<T>> DispatchAsync<T>(IQuery<T> query, Principal principal);
+        Task<IQueryable<T>> DispatchAsync<T>(IQuery<T> query, IPrincipal principal);
 
         /// <summary>
         /// Dispatch the command to the <see cref="MessageHandler"/> configured to handle it.
         /// </summary>
         /// <param name="command">The command.</param>
         /// <param name="principal">The principal dispatching the command.</param>
-        Task<bool> TryDispatchAsync(Command command, Principal principal);
+        Task<bool> TryDispatchAsync(Command command, IPrincipal principal);
     }
 }
