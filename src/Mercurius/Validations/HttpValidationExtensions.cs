@@ -70,7 +70,7 @@ namespace Mercurius.Validations
         /// <param name="results">The results.</param>
         /// <param name="flattenedResults">The flattened results.</param>
         /// <returns></returns>
-        public static List<ValidationResult> Flatten(List<ValidationResult> results, List<ValidationResult> flattenedResults = null)
+        public static List<ValidationResult> Flatten(this List<ValidationResult> results, List<ValidationResult> flattenedResults = null)
         {
             flattenedResults = flattenedResults ?? new List<ValidationResult>();
 

@@ -2,14 +2,53 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.Contracts;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Security.Principal;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Mercurius.Validations
 {
     public static class ValidationExtensions
     {
+        public const string PrincipalKey = "PrincipalKey";
+
+        public static async Task IsValidOrThrowExceptionAsync(this IMessage message, IServiceProvider serviceProvider, IPrincipal principal)
+        {
+            var validationResults = new List<ValidationResult>();
+
+            var context = new ValidationContext(message, serviceProvider, principal.CreateItems());
+
+            if (!await AsyncValidator.TryValidateObjectAsync(message, context, validationResults).ConfigureAwait(false))
+            {
+                var errors = new JObject();
+
+                var flattenedValidationResults = validationResults.Flatten();
+
+                foreach (var validationResult in flattenedValidationResults)
+                {
+                    if (validationResult.MemberNames.Any() && !errors.ContainsKey(validationResult.MemberNames.First()))
+                    {
+                        errors.Add(validationResult.MemberNames.First(), validationResult.ErrorMessage);
+                    }
+                    else
+                    {
+                        errors.Add("", validationResult.ErrorMessage);
+                    }
+                }
+
+                throw new Exception($"The message of type {message.GetType()} is not valid: {JsonConvert.SerializeObject(errors)}");
+            }
+        }
+
+        public static Dictionary<object, object> CreateItems(this IPrincipal principal)
+        {
+            return new Dictionary<object, object> { { PrincipalKey, principal } };
+        }
+
         /// <summary>
         /// Determines whether this instance is valid.
         /// </summary>
