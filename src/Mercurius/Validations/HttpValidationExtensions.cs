@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Security.Principal;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
@@ -11,6 +12,16 @@ namespace Mercurius.Validations
     /// </summary>
     public static class HttpValidationExtensions
     {
+        /// <summary>Populates the model state with any validation errors.</summary>
+        /// <param name="instance"></param>
+        /// <param name="serviceProvider"></param>
+        /// <param name="modelState"></param>
+        /// <param name="principal"></param>
+        public static async Task ValidateAsync(this IAsyncValidatableObject instance, IServiceProvider serviceProvider, ModelStateDictionary modelState, IPrincipal principal)
+        {
+            await instance.IsValidAsync(serviceProvider, modelState, principal.CreateItems());
+        }
+
         /// <summary>
         /// Determines whether this instance is valid.
         /// </summary>

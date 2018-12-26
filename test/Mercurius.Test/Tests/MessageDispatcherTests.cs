@@ -1,6 +1,5 @@
 using System;
 using System.Security.Claims;
-using System.Security.Principal;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Mercurius.Test.Domain.Customers;
@@ -47,7 +46,7 @@ namespace Mercurius.Test.Tests
             Func<Task> action = async () => await messageDispatcher.DispatchAsync(@event, ClaimsPrincipal.Current);
 
             // Assert
-            action.ShouldThrow<Exception>();
+            action.Should().Throw<Exception>();
         }
     }
 }
