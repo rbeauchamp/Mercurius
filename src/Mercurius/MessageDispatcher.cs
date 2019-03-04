@@ -7,6 +7,7 @@ using Mercurius.Validations;
 
 namespace Mercurius
 {
+    /// <inheritdoc />
     public class MessageDispatcher : IMessageDispatcher
     {
         private readonly IEnumerable<IMessageHandler> _messageHandlers;
@@ -29,7 +30,7 @@ namespace Mercurius
 
             if (!messageHandlersList.Any())
             {
-                throw new Exception($"Could not find at least one handler for the message type {@event.GetType()}");
+                throw new Exception($"Could not find at least one handler for the event type {@event.GetType()}");
             }
 
             var tasks = messageHandlersList.Select(async handler => await handler.HandleAsync(@event, principal).ConfigureAwait(false));
@@ -50,6 +51,25 @@ namespace Mercurius
             }
 
             return await messageHandler.TryHandleAsync(command, principal).ConfigureAwait(false);
+        }
+
+        public async Task<bool> TryDispatchAsync(Event @event, IPrincipal principal)
+        {
+            await @event.IsValidOrThrowExceptionAsync(_serviceProvider, principal).ConfigureAwait(false);
+
+            var messageHandlers = _messageHandlers
+                .Where(handler => handler.MessageTypes.Any(type => type.IsInstanceOfType(@event)));
+
+            var messageHandlersList = messageHandlers as IList<IMessageHandler> ?? messageHandlers.ToList();
+
+            if (!messageHandlersList.Any())
+            {
+                throw new Exception($"Could not find at least one handler for the event type {@event.GetType()}");
+            }
+
+            var tasks = messageHandlersList.Select(async handler => await handler.TryHandleAsync(@event, principal).ConfigureAwait(false));
+
+            return (await Task.WhenAll(tasks).ConfigureAwait(false)).All(result => result);
         }
 
         public async Task<IQueryable<T>> DispatchAsync<T>(IQuery<T> query, IPrincipal principal)

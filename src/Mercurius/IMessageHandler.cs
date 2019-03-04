@@ -14,6 +14,7 @@ namespace Mercurius
         /// <summary>
         /// Handle the event.
         /// </summary>
+        [Obsolete("HandleAsync is deprecated, please use TryHandleAsync instead.")]
         Task HandleAsync(Event @event, IPrincipal principal);
 
         /// <summary>
@@ -27,6 +28,13 @@ namespace Mercurius
         /// otherwise, false.
         /// </summary>
         Task<bool> TryHandleAsync(Command command, IPrincipal principal);
+
+        /// <summary>
+        /// Try to handle the event.
+        /// If successfully handled, return true,
+        /// otherwise, false.
+        /// </summary>
+        Task<bool> TryHandleAsync(Event @event, IPrincipal principal);
 
         /// <summary>
         /// The types of messages handled by this message handler.
