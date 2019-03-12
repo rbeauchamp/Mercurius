@@ -31,7 +31,7 @@ namespace Mercurius.Test.Tests
         }
 
         [Fact]
-        public void It_should_throw_an_exception_if_no_handler_found_for_event()
+        public void It_should_NOT_throw_an_exception_if_no_handler_found_for_event()
         {
             // Arrange
             var serviceProvider = new ServiceCollection()
@@ -46,7 +46,45 @@ namespace Mercurius.Test.Tests
             Func<Task> action = async () => await messageDispatcher.DispatchAsync(@event, ClaimsPrincipal.Current);
 
             // Assert
-            action.Should().Throw<Exception>();
+            action.Should().NotThrow();
+        }
+
+        [Fact]
+        public async Task It_should_return_true_if_no_handler_found_for_event()
+        {
+            // Arrange
+            var serviceProvider = new ServiceCollection()
+                .AddTransient<IMessageDispatcher, MessageDispatcher>()
+                .AddTransient<IMessageHandler, CustomersDomain>()
+                .BuildServiceProvider();
+
+            var @event = new CustomerCreated();
+            var messageDispatcher = serviceProvider.GetRequiredService<IMessageDispatcher>();
+
+            // Act
+            var result = await messageDispatcher.TryDispatchAsync(@event, ClaimsPrincipal.Current);
+
+            // Assert
+            result.Should().BeTrue();
+        }
+
+        [Fact]
+        public async Task It_should_return_true_if_no_handler_found_for_command()
+        {
+            // Arrange
+            var serviceProvider = new ServiceCollection()
+                .AddTransient<IMessageDispatcher, MessageDispatcher>()
+                .AddTransient<IMessageHandler, CustomersDomain>()
+                .BuildServiceProvider();
+
+            var command = new CreateCustomer();
+            var messageDispatcher = serviceProvider.GetRequiredService<IMessageDispatcher>();
+
+            // Act
+            var result = await messageDispatcher.TryDispatchAsync(command, ClaimsPrincipal.Current);
+
+            // Assert
+            result.Should().BeTrue();
         }
     }
 }

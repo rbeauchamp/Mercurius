@@ -28,14 +28,12 @@ namespace Mercurius
 
             var messageHandlersList = messageHandlers as IList<IMessageHandler> ?? messageHandlers.ToList();
 
-            if (!messageHandlersList.Any())
+            if (messageHandlersList.Any())
             {
-                throw new Exception($"Could not find at least one handler for the event type {@event.GetType()}");
+                var tasks = messageHandlersList.Select(async handler => await handler.HandleAsync(@event, principal).ConfigureAwait(false));
+
+                await Task.WhenAll(tasks).ConfigureAwait(false);
             }
-
-            var tasks = messageHandlersList.Select(async handler => await handler.HandleAsync(@event, principal).ConfigureAwait(false));
-
-            await Task.WhenAll(tasks).ConfigureAwait(false);
         }
 
         public async Task<bool> TryDispatchAsync(Command command, IPrincipal principal)
@@ -47,7 +45,7 @@ namespace Mercurius
 
             if (messageHandler == null)
             {
-                throw new Exception($"Could not find a handler for the command type {command.GetType()}");
+                return true;
             }
 
             return await messageHandler.TryHandleAsync(command, principal).ConfigureAwait(false);
@@ -64,7 +62,7 @@ namespace Mercurius
 
             if (!messageHandlersList.Any())
             {
-                throw new Exception($"Could not find at least one handler for the event type {@event.GetType()}");
+                return true;
             }
 
             var tasks = messageHandlersList.Select(async handler => await handler.TryHandleAsync(@event, principal).ConfigureAwait(false));
@@ -81,7 +79,7 @@ namespace Mercurius
 
             if (messageHandler == null)
             {
-                throw new Exception($"Could not find a handler for the query type {query.GetType()}");
+                return Enumerable.Empty<T>().AsQueryable();
             }
 
             return await messageHandler.GetAsync(query, principal).ConfigureAwait(false);
