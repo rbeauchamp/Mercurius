@@ -10,7 +10,7 @@
     <AssemblyName>Mercurius</AssemblyName>
     <PackageId>Mercurius</PackageId>
     <PackageProjectUrl>https://github.com/rbeauchamp/Mercurius</PackageProjectUrl>
-    <PackageLicenseUrl>https://github.com/rbeauchamp/Mercurius/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/rbeauchamp/Mercurius</RepositoryUrl>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
