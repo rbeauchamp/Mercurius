@@ -1,4 +1,3 @@
-using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -23,30 +22,11 @@ namespace Mercurius.Test.Tests
             var messageDispatcher = serviceProvider.GetRequiredService<IMessageDispatcher>();
 
             // Act
-            var results = await messageDispatcher.DispatchAsync(query, ClaimsPrincipal.Current);
+            var results = await messageDispatcher.TryDispatchAsync(query, ClaimsPrincipal.Current);
 
             // Assert
             results.Should().NotBeNull();
             results.Should().HaveCount(1);
-        }
-
-        [Fact]
-        public void It_should_NOT_throw_an_exception_if_no_handler_found_for_event()
-        {
-            // Arrange
-            var serviceProvider = new ServiceCollection()
-                .AddTransient<IMessageDispatcher, MessageDispatcher>()
-                .AddTransient<IMessageHandler, CustomersDomain>()
-                .BuildServiceProvider();
-
-            var @event = new CustomerCreated();
-            var messageDispatcher = serviceProvider.GetRequiredService<IMessageDispatcher>();
-
-            // Act
-            Func<Task> action = async () => await messageDispatcher.DispatchAsync(@event, ClaimsPrincipal.Current);
-
-            // Assert
-            action.Should().NotThrow();
         }
 
         [Fact]

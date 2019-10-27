@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Version>3.0.0</Version>
+    <Version>4.0.0</Version>
     <Description>Messaging infrastructure for .NET</Description>
-    <Copyright>Richard Beauchamp 2016-2017</Copyright>
+    <Copyright>Richard Beauchamp 2016-2019</Copyright>
     <AssemblyTitle>Mercurius</AssemblyTitle>
     <NeutralLanguage>en-US</NeutralLanguage>
     <Authors>Richard Beauchamp</Authors>
@@ -17,8 +17,8 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.2.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
-    <PackageReference Include="System.ComponentModel.Annotations" Version="4.5.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+    <PackageReference Include="System.ComponentModel.Annotations" Version="4.6.0" />
     <PackageReference Include="System.ComponentModel.TypeConverter" Version="4.3.0" />
   </ItemGroup>
 </Project>

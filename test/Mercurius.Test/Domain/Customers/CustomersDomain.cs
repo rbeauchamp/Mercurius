@@ -17,20 +17,20 @@ namespace Mercurius.Test.Domain.Customers
             }
         }
 
-        public override async Task<IQueryable<T>> GetAsync<T>(IQuery<T> query, IPrincipal principal)
+        public override async Task<T> TryGetAsync<T>(IQuery<T> query, IPrincipal principal)
         {
             switch (query)
             {
                 case GetCustomers querySubType:
-                    return (IQueryable<T>) await GetAsync(querySubType, principal);
+                    return (T) await TryGetAsync(querySubType, principal);
                 default:
                     throw new Exception($"A case must be created to handle the query type {query.GetType()}");
             }
         }
 
-        private static Task<IQueryable<Customer>> GetAsync(GetCustomers getCustomers, IPrincipal principal)
+        private static Task<IQueryable<Customer>> TryGetAsync(GetCustomers querySubType, IPrincipal principal)
         {
-            return Task.FromResult(new List<Customer>{new Customer()}.AsQueryable());
+            return Task.FromResult(new List<Customer> { new Customer() }.AsQueryable());
         }
     }
 }
