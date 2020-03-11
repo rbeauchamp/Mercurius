@@ -87,8 +87,7 @@ namespace Mercurius.Validations
 
             foreach (var validationResult in results)
             {
-                var compositeValidationResult = validationResult as CompositeValidationResult;
-                if (compositeValidationResult != null)
+                if (validationResult is CompositeValidationResult compositeValidationResult)
                 {
                     flattenedResults = Flatten(compositeValidationResult.Results, flattenedResults);
                 }

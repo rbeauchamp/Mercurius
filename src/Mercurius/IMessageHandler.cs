@@ -19,7 +19,7 @@ namespace Mercurius
         IEnumerable<Type> MessageTypes { get; }
 
         /// <summary>
-        /// Get the results of query.
+        /// Get the results of the query.
         /// </summary>
         Task<T> TryGetAsync<T>(IQuery<T> query, IPrincipal principal);
 

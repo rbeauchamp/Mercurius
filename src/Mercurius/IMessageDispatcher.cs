@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Security.Principal;
+﻿using System.Security.Principal;
 using System.Threading.Tasks;
 
 namespace Mercurius
@@ -13,7 +11,9 @@ namespace Mercurius
         /// <typeparam name="T">The type returned by the query.</typeparam>
         /// <param name="query">The query.</param>
         /// <param name="principal">The principal dispatching the query.</param>
-        /// <returns>A non-null queryable of the given <typeparamref name="T"/></returns>
+        /// <returns>
+        /// A result of the given type <typeparamref name="T" />
+        /// </returns>
         Task<T> TryDispatchAsync<T>(IQuery<T> query, IPrincipal principal);
 
         /// <summary>

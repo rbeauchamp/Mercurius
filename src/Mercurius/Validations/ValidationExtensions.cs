@@ -81,8 +81,7 @@ namespace Mercurius.Validations
         {
             var type = typeof (TSource);
 
-            var member = propertyLambda.Body as MemberExpression;
-            if (member == null)
+            if (!(propertyLambda.Body is MemberExpression member))
             {
                 throw new ArgumentException($"Expression '{propertyLambda}' refers to a method, not a property.");
             }
@@ -95,7 +94,7 @@ namespace Mercurius.Validations
 
             //if (type != propInfo.ReflectedType && !type.IsSubclassOf(propInfo.ReflectedType))
             if (type != propInfo.DeclaringType && !type.IsSubclassOf(propInfo.DeclaringType))
-                {
+            {
                 throw new ArgumentException($"Expresion '{propertyLambda}' refers to a property that is not from type {type}.");
             }
 
