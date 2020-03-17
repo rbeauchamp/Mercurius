@@ -13,14 +13,14 @@ namespace Mercurius.Test.Domain.Orders
         public bool ReturnValidationError { get; set; }
 
         /// <inheritdoc />
-        public override async Task<IEnumerable<ValidationResult>> ValidateAsync(ValidationContext validationContext)
+        public override Task<IEnumerable<ValidationResult>> ValidateAsync(ValidationContext validationContext)
         {
             return ReturnValidationError
-                ? new List<ValidationResult>
+                ? Task.FromResult((IEnumerable<ValidationResult>) new List<ValidationResult>
                 {
                     new ValidationResult("The order is not valid")
-                }
-                : new List<ValidationResult>();
+                })
+                : Task.FromResult((IEnumerable<ValidationResult>) new List<ValidationResult>());
         }
     }
 }

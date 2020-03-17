@@ -1,10 +1,7 @@
-using System.Collections.Generic;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Mercurius.Test.Domain.Customers;
 using Mercurius.Test.Domain.Orders;
-using Mercurius.Test.Services;
 using Mercurius.Validations;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
@@ -20,19 +17,14 @@ namespace Mercurius.Test.Tests
             var serviceProvider = new ServiceCollection()
                 .BuildServiceProvider();
 
-            var updateCustomer = new UpdateCustomer
+            var updateCustomer = new UpdateCustomer();
+            updateCustomer.Categories.Add(new CreateOrder
             {
-                Categories = new List<CreateOrder>
-                {
-                    new CreateOrder
-                    {
-                        ReturnValidationError = true
-                    }
-                }
-            };
+                ReturnValidationError = true
+            });
 
             // Act
-            var isValid = await updateCustomer.IsValidAsync(serviceProvider);
+            var isValid = await updateCustomer.IsValidAsync(serviceProvider).ConfigureAwait(false);
 
             // Assert
             isValid.Should().BeFalse();

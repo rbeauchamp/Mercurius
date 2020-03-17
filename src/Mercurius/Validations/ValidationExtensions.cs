@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.Contracts;
+using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -68,16 +69,21 @@ namespace Mercurius.Validations
         [Pure]
         public static async Task<bool> IsValidAsync(this object instance, IServiceProvider serviceProvider)
         {
-            return await AsyncValidator.TryValidateObjectAsync(instance, new ValidationContext(instance, serviceProvider, null), null, true).ConfigureAwait(false);
+            return await AsyncValidator.TryValidateObjectAsync(instance, new ValidationContext(instance, serviceProvider, null), null).ConfigureAwait(false);
         }
 
         public static ValidationResult CreateValidationError<TSource, TProperty>(this TSource source, Expression<Func<TSource, TProperty>> propertyLambda, string errorMessageFormat)
         {
-            var propertyName = GetPropertyInfo(source, propertyLambda).Name;
-            return new ValidationResult(string.Format(errorMessageFormat, propertyName), new List<string>{propertyName});
+            if (propertyLambda is null)
+            {
+                throw new ArgumentNullException(nameof(propertyLambda));
+            }
+
+            var propertyName = GetPropertyInfo(propertyLambda).Name;
+            return new ValidationResult(string.Format(CultureInfo.InvariantCulture, errorMessageFormat, propertyName), new List<string>{propertyName});
         }
 
-        private static PropertyInfo GetPropertyInfo<TSource, TProperty>(TSource source, Expression<Func<TSource, TProperty>> propertyLambda)
+        private static PropertyInfo GetPropertyInfo<TSource, TProperty>(Expression<Func<TSource, TProperty>> propertyLambda)
         {
             var type = typeof (TSource);
 

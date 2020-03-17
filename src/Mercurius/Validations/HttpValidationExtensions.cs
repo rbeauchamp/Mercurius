@@ -19,7 +19,7 @@ namespace Mercurius.Validations
         /// <param name="principal"></param>
         public static async Task ValidateAsync(this IAsyncValidatableObject instance, IServiceProvider serviceProvider, ModelStateDictionary modelState, IPrincipal principal)
         {
-            await instance.IsValidAsync(serviceProvider, modelState, principal.CreateItems());
+            await instance.IsValidAsync(serviceProvider, modelState, principal.CreateItems()).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -31,9 +31,14 @@ namespace Mercurius.Validations
         /// <param name="items">The dictionary of key/value pairs to associate with this context.</param>
         public static async Task<bool> IsValidAsync(this IAsyncValidatableObject instance, IServiceProvider serviceProvider, ModelStateDictionary modelState, IDictionary<object, object> items)
         {
+            if (modelState is null)
+            {
+                throw new ArgumentNullException(nameof(modelState));
+            }
+
             var validationResults = new List<ValidationResult>();
 
-            var isValid = await AsyncValidator.TryValidateObjectAsync(instance, new ValidationContext(instance, serviceProvider, items), validationResults, true).ConfigureAwait(false);
+            var isValid = await AsyncValidator.TryValidateObjectAsync(instance, new ValidationContext(instance, serviceProvider, items), validationResults).ConfigureAwait(false);
 
             var flattenedValidationResults = Flatten(validationResults);
 
@@ -81,8 +86,13 @@ namespace Mercurius.Validations
         /// <param name="results">The results.</param>
         /// <param name="flattenedResults">The flattened results.</param>
         /// <returns></returns>
-        public static List<ValidationResult> Flatten(this List<ValidationResult> results, List<ValidationResult> flattenedResults = null)
+        public static List<ValidationResult> Flatten(this IEnumerable<ValidationResult> results, List<ValidationResult> flattenedResults = null)
         {
+            if (results is null)
+            {
+                throw new ArgumentNullException(nameof(results));
+            }
+
             flattenedResults = flattenedResults ?? new List<ValidationResult>();
 
             foreach (var validationResult in results)

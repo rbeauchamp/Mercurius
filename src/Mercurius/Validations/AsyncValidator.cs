@@ -13,14 +13,19 @@ namespace Mercurius.Validations
     {
         private static readonly ValidationAttributeStore Store = ValidationAttributeStore.Instance;
 
-        public static bool TryValidateProperty(object value, ValidationContext validationContext, ICollection<ValidationResult> validationResults)
+        public static async Task<bool> TryValidatePropertyAsync(object value, ValidationContext validationContext, ICollection<ValidationResult> validationResults)
         {
+            if (validationContext is null)
+            {
+                throw new ArgumentNullException(nameof(validationContext));
+            }
+
             var propertyType = Store.GetPropertyType(validationContext);
             EnsureValidPropertyType(propertyType, value);
             var flag = true;
             var breakOnFirstError = validationResults == null;
             var validationAttributes = Store.GetPropertyValidationAttributes(validationContext);
-            foreach (var validationError in GetValidationErrors(value, validationContext, validationAttributes, breakOnFirstError))
+            foreach (var validationError in await GetValidationErrorsAsync(value, validationContext, validationAttributes, breakOnFirstError).ConfigureAwait(false))
             {
                 flag = false;
                 validationResults?.Add(validationError.ValidationResult);
@@ -28,7 +33,7 @@ namespace Mercurius.Validations
             return flag;
         }
 
-        public static async Task<bool> TryValidateObjectAsync(object instance, ValidationContext validationContext, ICollection<ValidationResult> validationResults, bool validateAllProperties = false)
+        public static async Task<bool> TryValidateObjectAsync(object instance, ValidationContext validationContext, ICollection<ValidationResult> validationResults)
         {
             if (instance == null)
             {
@@ -36,11 +41,11 @@ namespace Mercurius.Validations
             }
             if (validationContext != null && instance != validationContext.ObjectInstance)
             {
-                throw new ArgumentException("InstanceMustMatchValidationContextInstance", nameof(instance));
+                throw new ArgumentException(ExceptionMessages.InstanceMustMatchValidationContextInstance, nameof(instance));
             }
             var flag = true;
             var breakOnFirstError = validationResults == null;
-            foreach (var validationError in await GetObjectValidationErrorsAsync(instance, validationContext, validateAllProperties, breakOnFirstError).ConfigureAwait(false))
+            foreach (var validationError in await GetObjectValidationErrorsAsync(instance, validationContext, breakOnFirstError).ConfigureAwait(false))
             {
                 flag = false;
                 validationResults?.Add(validationError.ValidationResult);
@@ -48,11 +53,11 @@ namespace Mercurius.Validations
             return flag;
         }
 
-        public static bool TryValidateValue(object value, ValidationContext validationContext, ICollection<ValidationResult> validationResults, IEnumerable<ValidationAttribute> validationAttributes)
+        public static async Task<bool> TryValidateValueAsync(object value, ValidationContext validationContext, ICollection<ValidationResult> validationResults, IEnumerable<ValidationAttribute> validationAttributes)
         {
             var flag = true;
             var breakOnFirstError = validationResults == null;
-            foreach (var validationError in GetValidationErrors(value, validationContext, validationAttributes, breakOnFirstError))
+            foreach (var validationError in await GetValidationErrorsAsync(value, validationContext, validationAttributes, breakOnFirstError).ConfigureAwait(false))
             {
                 flag = false;
                 validationResults?.Add(validationError.ValidationResult);
@@ -60,21 +65,21 @@ namespace Mercurius.Validations
             return flag;
         }
 
-        public static void ValidateProperty(object value, ValidationContext validationContext)
+        public static async Task ValidatePropertyAsync(object value, ValidationContext validationContext)
         {
+            if (validationContext is null)
+            {
+                throw new ArgumentNullException(nameof(validationContext));
+            }
+
             var propertyType = Store.GetPropertyType(validationContext);
             EnsureValidPropertyType(propertyType, value);
             var validationAttributes = Store.GetPropertyValidationAttributes(validationContext);
-            var validationError = GetValidationErrors(value, validationContext, validationAttributes, false).FirstOrDefault();
+            var validationError = (await GetValidationErrorsAsync(value, validationContext, validationAttributes, false).ConfigureAwait(false)).FirstOrDefault();
             validationError?.ThrowValidationException();
         }
 
         public static async Task ValidateObjectAsync(object instance, ValidationContext validationContext)
-        {
-            await ValidateObjectAsync(instance, validationContext, false).ConfigureAwait(false);
-        }
-
-        public static async Task ValidateObjectAsync(object instance, ValidationContext validationContext, bool validateAllProperties)
         {
             if (instance == null)
             {
@@ -86,19 +91,21 @@ namespace Mercurius.Validations
             }
             if (instance != validationContext.ObjectInstance)
             {
-                throw new ArgumentException("InstanceMustMatchValidationContextInstance", nameof(instance));
+                throw new ArgumentException(ExceptionMessages.InstanceMustMatchValidationContextInstance, nameof(instance));
             }
-            var validationError = (await GetObjectValidationErrorsAsync(instance, validationContext, validateAllProperties, false).ConfigureAwait(false)).FirstOrDefault();
+
+            var validationError = (await GetObjectValidationErrorsAsync(instance, validationContext, false).ConfigureAwait(false)).FirstOrDefault();
+
             validationError?.ThrowValidationException();
         }
 
-        public static void ValidateValue(object value, ValidationContext validationContext, IEnumerable<ValidationAttribute> validationAttributes)
+        public static async Task ValidateValueAsync(object value, ValidationContext validationContext, IEnumerable<ValidationAttribute> validationAttributes)
         {
             if (validationContext == null)
             {
                 throw new ArgumentNullException(nameof(validationContext));
             }
-            var validationError = GetValidationErrors(value, validationContext, validationAttributes, false).FirstOrDefault();
+            var validationError = (await GetValidationErrorsAsync(value, validationContext, validationAttributes, false).ConfigureAwait(false)).FirstOrDefault();
             validationError?.ThrowValidationException();
         }
 
@@ -140,7 +147,7 @@ namespace Mercurius.Validations
             }
         }
 
-        private static async Task<IEnumerable<ValidationError>> GetObjectValidationErrorsAsync(object instance, ValidationContext validationContext, bool validateAllProperties, bool breakOnFirstError)
+        private static async Task<IEnumerable<ValidationError>> GetObjectValidationErrorsAsync(object instance, ValidationContext validationContext, bool breakOnFirstError)
         {
             if (instance == null)
             {
@@ -151,13 +158,13 @@ namespace Mercurius.Validations
                 throw new ArgumentNullException(nameof(validationContext));
             }
             var list = new List<ValidationError>();
-            list.AddRange(await GetObjectPropertyValidationErrorsAsync(instance, validationContext, validateAllProperties, breakOnFirstError).ConfigureAwait(false));
+            list.AddRange(await GetObjectPropertyValidationErrorsAsync(instance, validationContext, breakOnFirstError).ConfigureAwait(false));
             if (list.Any())
             {
                 return list;
             }
             var validationAttributes = Store.GetTypeValidationAttributes(validationContext);
-            list.AddRange(GetValidationErrors(instance, validationContext, validationAttributes, breakOnFirstError));
+            list.AddRange(await GetValidationErrorsAsync(instance, validationContext, validationAttributes, breakOnFirstError).ConfigureAwait(false));
             if (list.Any())
             {
                 return list;
@@ -170,55 +177,55 @@ namespace Mercurius.Validations
             return list;
         }
 
-        private static async Task<IEnumerable<ValidationError>> GetObjectPropertyValidationErrorsAsync(object instance, ValidationContext validationContext, bool validateAllProperties, bool breakOnFirstError)
+        private static async Task<IEnumerable<ValidationError>> GetObjectPropertyValidationErrorsAsync(object instance, ValidationContext validationContext, bool breakOnFirstError)
         {
             var propertyValues = GetPropertyValues(instance, validationContext);
             var list = new List<ValidationError>();
             foreach (var keyValuePair in propertyValues)
             {
                 var validationAttributes = Store.GetPropertyValidationAttributes(keyValuePair.Key);
-                if (validateAllProperties)
-                {
-                    list.AddRange(await GetValidationErrors(keyValuePair.Value, keyValuePair.Key, validationAttributes, breakOnFirstError));
-                }
-                else
-                {
-                    var attributes = validationAttributes.ToList();
+                //if (validateAllProperties)
+                //{
+                    list.AddRange(await GetValidationErrorsAsync(keyValuePair.Value, keyValuePair.Key, validationAttributes, breakOnFirstError).ConfigureAwait(false));
+                //}
+                //else
+                //{
+                //    var attributes = validationAttributes.ToList();
 
-                    if (attributes.FirstOrDefault(a => a is RequiredAttribute) is RequiredAttribute requiredAttribute)
-                    {
-                        var validationResult = requiredAttribute.GetValidationResult(keyValuePair.Value, keyValuePair.Key);
-                        if (validationResult != ValidationResult.Success)
-                        {
-                            list.Add(new ValidationError(requiredAttribute, keyValuePair.Value, validationResult));
+                //    if (attributes.FirstOrDefault(a => a is RequiredAttribute) is RequiredAttribute requiredAttribute)
+                //    {
+                //        var validationResult = requiredAttribute.GetValidationResult(keyValuePair.Value, keyValuePair.Key);
+                //        if (validationResult != ValidationResult.Success)
+                //        {
+                //            list.Add(new ValidationError(requiredAttribute, keyValuePair.Value, validationResult));
 
-                            if (breakOnFirstError)
-                            {
-                                if (list.Any())
-                                {
-                                    break;
-                                }
-                            }
-                        }
-                    }
+                //            if (breakOnFirstError)
+                //            {
+                //                if (list.Any())
+                //                {
+                //                    break;
+                //                }
+                //            }
+                //        }
+                //    }
 
-                    if (attributes.FirstOrDefault(a => a is ValidateObjectAttribute) is ValidateObjectAttribute validateObjectAttribute)
-                    {
-                        var validationResult = await validateObjectAttribute.GetValidationResultAsync(keyValuePair.Value, keyValuePair.Key);
-                        if (validationResult != ValidationResult.Success)
-                        {
-                            list.Add(new ValidationError(validateObjectAttribute, keyValuePair.Value, validationResult));
+                //    if (attributes.FirstOrDefault(a => a is IAsyncValidationAttribute) is IAsyncValidationAttribute asyncValidationAttribute)
+                //    {
+                //        var validationResult = await asyncValidationAttribute.IsValidAsync(keyValuePair.Value, keyValuePair.Key);
+                //        if (validationResult != ValidationResult.Success)
+                //        {
+                //            list.Add(new ValidationError(asyncValidationAttribute, keyValuePair.Value, validationResult));
 
-                            if (breakOnFirstError)
-                            {
-                                if (list.Any())
-                                {
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
+                //            if (breakOnFirstError)
+                //            {
+                //                if (list.Any())
+                //                {
+                //                    break;
+                //                }
+                //            }
+                //        }
+                //    }
+                //}
 
                 if (breakOnFirstError)
                 {
@@ -247,7 +254,7 @@ namespace Mercurius.Validations
             return list;
         }
 
-        private static IEnumerable<ValidationError> GetValidationErrors(object value, ValidationContext validationContext, IEnumerable<ValidationAttribute> attributes, bool breakOnFirstError)
+        private static async Task<IEnumerable<ValidationError>> GetValidationErrorsAsync(object value, ValidationContext validationContext, IEnumerable<ValidationAttribute> attributes, bool breakOnFirstError)
         {
             if (validationContext == null)
             {
@@ -256,39 +263,59 @@ namespace Mercurius.Validations
             var list = new List<ValidationError>();
             var validationAttributes = attributes as IList<ValidationAttribute> ?? attributes.ToList();
             var requiredAttribute = validationAttributes.FirstOrDefault(a => a is RequiredAttribute) as RequiredAttribute;
-            if (requiredAttribute != null && !TryValidate(value, validationContext, requiredAttribute, out var validationError))
+            if (requiredAttribute != null)
             {
-                list.Add(validationError);
-                return list;
+                var validationError = await TryValidateAsync(value, validationContext, requiredAttribute).ConfigureAwait(false);
+
+                if (validationError != null)
+                {
+                    list.Add(validationError);
+                    return list;
+                }
             }
             foreach (var attribute in validationAttributes)
             {
-                if (!Equals(attribute, requiredAttribute) && !TryValidate(value, validationContext, attribute, out validationError))
+                if (!Equals(attribute, requiredAttribute))
                 {
-                    list.Add(validationError);
-                    if (breakOnFirstError)
+                    var validationError = await TryValidateAsync(value, validationContext, attribute).ConfigureAwait(false);
+
+                    if (validationError != null)
                     {
-                        break;
+                        list.Add(validationError);
+                        if (breakOnFirstError)
+                        {
+                            break;
+                        }
                     }
                 }
             }
             return list;
         }
 
-        private static bool TryValidate(object value, ValidationContext validationContext, ValidationAttribute attribute, out ValidationError validationError)
+        private static async Task<ValidationError> TryValidateAsync(object value, ValidationContext validationContext, ValidationAttribute attribute)
         {
             if (validationContext == null)
             {
                 throw new ArgumentNullException(nameof(validationContext));
             }
+
             var validationResult = attribute.GetValidationResult(value, validationContext);
+
             if (validationResult != ValidationResult.Success)
             {
-                validationError = new ValidationError(attribute, value, validationResult);
-                return false;
+                return new ValidationError(attribute, value, validationResult);
             }
-            validationError = null;
-            return true;
+
+            if (attribute is IAsyncValidationAttribute asyncValidationAttribute)
+            {
+                var asyncValidationResult = await asyncValidationAttribute.IsValidAsync(value, validationContext).ConfigureAwait(false);
+                if (asyncValidationResult != ValidationResult.Success)
+                {
+                    return new ValidationError(attribute, value, asyncValidationResult);
+                }
+            }
+
+            return null;
         }
 
         private class ValidationError

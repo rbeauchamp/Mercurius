@@ -22,7 +22,7 @@ namespace Mercurius.Test.Tests
             var messageDispatcher = serviceProvider.GetRequiredService<IMessageDispatcher>();
 
             // Act
-            var results = await messageDispatcher.TryDispatchAsync(query, ClaimsPrincipal.Current);
+            var results = await messageDispatcher.TryDispatchAsync(query, ClaimsPrincipal.Current).ConfigureAwait(false);
 
             // Assert
             results.Should().NotBeNull();
@@ -42,7 +42,7 @@ namespace Mercurius.Test.Tests
             var messageDispatcher = serviceProvider.GetRequiredService<IMessageDispatcher>();
 
             // Act
-            var result = await messageDispatcher.TryDispatchAsync(@event, ClaimsPrincipal.Current);
+            var result = await messageDispatcher.TryDispatchAsync(@event, ClaimsPrincipal.Current).ConfigureAwait(false);
 
             // Assert
             result.Should().BeTrue();
@@ -61,7 +61,7 @@ namespace Mercurius.Test.Tests
             var messageDispatcher = serviceProvider.GetRequiredService<IMessageDispatcher>();
 
             // Act
-            var result = await messageDispatcher.TryDispatchAsync(command, ClaimsPrincipal.Current);
+            var result = await messageDispatcher.TryDispatchAsync(command, ClaimsPrincipal.Current).ConfigureAwait(false);
 
             // Assert
             result.Should().BeTrue();

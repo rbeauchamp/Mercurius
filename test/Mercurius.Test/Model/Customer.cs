@@ -24,7 +24,6 @@ namespace Mercurius.Test.Model
         public string FaxNumber { get; set; }
         public string DeliveryRun { get; set; }
         public string RunPosition { get; set; }
-        public string WebsiteUrl { get; set; }
         public string DeliveryAddressLine1 { get; set; }
         public string DeliveryAddressLine2 { get; set; }
         public string DeliveryPostalCode { get; set; }

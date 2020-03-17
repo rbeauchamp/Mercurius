@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Mercurius.Validations
 {
-    public class ValidateObjectAttribute : ValidationAttribute
+    public class ValidateObjectAttribute : ValidationAttribute, IAsyncValidationAttribute
     {
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
@@ -15,6 +15,11 @@ namespace Mercurius.Validations
             {
                 // we cannot validate the properties of the given object when it is null
                 return ValidationResult.Success;
+            }
+
+            if (validationContext is null)
+            {
+                throw new ArgumentNullException(nameof(validationContext));
             }
 
             if (value is IDictionary dictionary)
@@ -113,7 +118,7 @@ namespace Mercurius.Validations
                 throw new ArgumentNullException(nameof(validationContext));
             }
 
-            var result = await IsValidAsync(value, validationContext);
+            var result = await IsValidAsync(value, validationContext).ConfigureAwait(false);
 
             // If validation fails, we want to ensure we have a ValidationResult that guarantees it has an ErrorMessage
             if (result != null)
@@ -128,8 +133,13 @@ namespace Mercurius.Validations
             return result;
         }
 
-        private static async Task<ValidationResult> IsValidAsync(object value, ValidationContext validationContext)
+        public async Task<ValidationResult> IsValidAsync(object value, ValidationContext validationContext)
         {
+            if (validationContext == null)
+            {
+                throw new ArgumentNullException(nameof(validationContext));
+            }
+
             if (value == null)
             {
                 // we cannot validate an object when it is null
@@ -138,28 +148,28 @@ namespace Mercurius.Validations
 
             if (value is IDictionary dictionary)
             {
-                return await ValidateDictionaryAsync(dictionary, validationContext);
+                return await ValidateDictionaryAsync(dictionary, validationContext).ConfigureAwait(false);
             }
 
             if (value is IEnumerable enumerable)
             {
-                return await ValidateEnumerableAsync(enumerable.OfType<object>(), validationContext);
+                return await ValidateEnumerableAsync(enumerable.OfType<object>(), validationContext).ConfigureAwait(false);
             }
 
-            return await ValidateObjectAsync(value, validationContext);
+            return await ValidateObjectAsync(value, validationContext).ConfigureAwait(false);
         }
 
         private static async Task<ValidationResult> ValidateDictionaryAsync(IDictionary dictionary, ValidationContext validationContext)
         {
             var compositeResults = new CompositeValidationResult($"Validation for {validationContext.DisplayName} failed");
 
-            var resultForKeys = await ValidateEnumerableAsync(dictionary.Keys.OfType<object>(), validationContext);
+            var resultForKeys = await ValidateEnumerableAsync(dictionary.Keys.OfType<object>(), validationContext).ConfigureAwait(false);
             if (resultForKeys != ValidationResult.Success)
             {
                 compositeResults.AddResult(resultForKeys);
             }
 
-            var resultForValues = await ValidateEnumerableAsync(dictionary.Values.OfType<object>(), validationContext);
+            var resultForValues = await ValidateEnumerableAsync(dictionary.Values.OfType<object>(), validationContext).ConfigureAwait(false);
             if (resultForValues != ValidationResult.Success)
             {
                 compositeResults.AddResult(resultForValues);
@@ -171,9 +181,9 @@ namespace Mercurius.Validations
 
         private static async Task<ValidationResult> ValidateEnumerableAsync(IEnumerable<object> enumerable, ValidationContext validationContext)
         {
-            var validationTasks = enumerable.Select(async item => await ValidateObjectAsync(item, new ValidationContext(item, validationContext, validationContext.Items)));
+            var validationTasks = enumerable.Select(async item => await ValidateObjectAsync(item, new ValidationContext(item, validationContext, validationContext.Items)).ConfigureAwait(false));
 
-            var results = await Task.WhenAll(validationTasks);
+            var results = await Task.WhenAll(validationTasks).ConfigureAwait(false);
 
             if (results.All(result => result == ValidationResult.Success))
             {
@@ -192,7 +202,7 @@ namespace Mercurius.Validations
             var results = new List<ValidationResult>();
             var context = new ValidationContext(value, validationContext, validationContext.Items);
 
-            await AsyncValidator.TryValidateObjectAsync(value, context, results, true);
+            await AsyncValidator.TryValidateObjectAsync(value, context, results).ConfigureAwait(false);
 
             if (results.Count == 0)
             {
